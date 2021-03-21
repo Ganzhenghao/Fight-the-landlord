@@ -1,12 +1,9 @@
 package com.ganzhenghao.fight.thread;
 
-import com.ganzhenghao.fight.bean.PokerNoColor;
 import lombok.AllArgsConstructor;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * @ClassName DealThread

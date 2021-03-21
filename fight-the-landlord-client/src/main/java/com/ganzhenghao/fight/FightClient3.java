@@ -4,8 +4,6 @@ import com.ganzhenghao.fight.bean.PokerNoColor;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,7 +13,7 @@ import java.util.List;
  * @Date 2021/3/20 17:50 星期六
  * @Version 1.0
  */
-public class FightClient {
+public class FightClient3 {
     /**
      * 手牌
      */
@@ -50,16 +48,16 @@ public class FightClient {
             }
             //返回确认收到信息
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
-            writer.write(id+"--> receive(1)");
+            writer.write(id+"--> receive(3)");
             writer.flush();
             socket.shutdownOutput();
-            System.out.println("player 1 手牌为:"+list);
+            System.out.println("player 3 手牌为:"+list);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         //第二次连接 发送自己的id号
-/*        try (Socket socket = new Socket("127.0.0.1", 5555)) {
+       /* try (Socket socket = new Socket("127.0.0.1", 5555)) {
 
             InputStream is = socket.getInputStream();
             OutputStream os = socket.getOutputStream();
@@ -86,7 +84,7 @@ public class FightClient {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
-
+        }
+*/
     }
 }
