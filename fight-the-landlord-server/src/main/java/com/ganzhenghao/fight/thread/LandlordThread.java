@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @ClassName LandlordThread
@@ -17,10 +18,11 @@ import java.util.List;
  */
 @AllArgsConstructor
 public class LandlordThread extends Thread{
-    private Socket socket;
-    private List<PokerNoColor> bottom;
-    private String randomId;
-
+    private final Socket socket;
+    private final List<PokerNoColor> bottom;
+    private final String randomId;
+    private final AtomicInteger sort;
+    private final Object lock;
     @Override
     public void run() {
 
@@ -35,10 +37,34 @@ public class LandlordThread extends Thread{
             ObjectOutputStream oos = new ObjectOutputStream(os);
             ArrayList<Object> info = new ArrayList<>();
             if (randomId.equals(id)){
-                // 0 -> 是否为地主   1 -> 底牌
+                // 0 -> 是否为地主   1 -> 出牌顺序   3-> 底牌
                 info.add(true);
+                synchronized (lock) {
+                    info.add(sort);
+
+                    //添加完成后 唤醒其他等待线程
+                    lock.notifyAll();
+                }
+
             }else{
+
                 info.add(false);
+
+                //如果不是地主 线程等待  直到是地主才唤醒
+                synchronized (lock){
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //唤醒后 赋值sort sort ++
+                synchronized (sort) {
+                    info.add(sort);
+                    sort.getAndIncrement();
+                }
+
             }
             info.add(bottom);
 

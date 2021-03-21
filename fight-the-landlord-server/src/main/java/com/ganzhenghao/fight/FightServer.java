@@ -74,13 +74,18 @@ public class FightServer {
 
             // TODO 判断三个连接的id和服务器id列表相同
 
-            //从ID列表随机一个ID 作为地主 TODO 抢地主
+            //从ID列表随机一个ID 作为地主 开启LandlordThread线程 TODO 抢地主
             Random random = new Random();
             int index = random.nextInt(3);
             String landlordId = PLAYERS_ID.get(index);
-            pool.submit(new LandlordThread(s1,bottom,landlordId));
-            pool.submit(new LandlordThread(s2,bottom,landlordId));
-            pool.submit(new LandlordThread(s3,bottom,landlordId));
+
+            //定义出牌顺序 默认为1
+
+            final AtomicInteger sort = new AtomicInteger(1);
+
+            pool.submit(new LandlordThread(s1,bottom,landlordId,sort,lock));
+            pool.submit(new LandlordThread(s2,bottom,landlordId,sort,lock));
+            pool.submit(new LandlordThread(s3,bottom,landlordId,sort,lock));
             //进入打牌环节
             
 
@@ -172,10 +177,10 @@ public class FightServer {
         //洗牌
         Collections.shuffle(POKER);
 
-        List<PokerNoColor> list1 = new ArrayList<>(POKER.subList(0, 16));
-        List<PokerNoColor> list2 = new ArrayList<>(POKER.subList(17, 33));
-        List<PokerNoColor> list3 = new ArrayList<>(POKER.subList(34, 50));
-        bottom = new ArrayList<>(POKER.subList(51, 53));
+        List<PokerNoColor> list1 = new ArrayList<>(POKER.subList(0, 17));
+        List<PokerNoColor> list2 = new ArrayList<>(POKER.subList(17, 34));
+        List<PokerNoColor> list3 = new ArrayList<>(POKER.subList(34, 51));
+        bottom = new ArrayList<>(POKER.subList(51, 54));
 
         Collections.sort(list1);
         Collections.sort(list2);
