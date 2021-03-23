@@ -22,12 +22,13 @@ public class FirstConnectThread extends Thread {
     private final Object[] playerInfo;
     private final Socket socket;
     private final Object lock;
+
     @Override
     public void run() {
         //线程阻塞,直到凑齐三个玩家
         try {
             System.out.println("lock--thread = " + lock);
-            synchronized (lock){
+            synchronized (lock) {
                 lock.wait();
             }
         } catch (InterruptedException e) {
@@ -41,14 +42,14 @@ public class FirstConnectThread extends Thread {
             InputStream is = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line = reader.readLine();
-            if (line.isBlank()){
-                throw  new RuntimeException("第一次连接时,未回复消息");
-            }else{
+            if (line.isBlank()) {
+                throw new RuntimeException("第一次连接时,未回复消息");
+            } else {
                 System.out.println(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             try {
                 socket.close();
             } catch (IOException e) {

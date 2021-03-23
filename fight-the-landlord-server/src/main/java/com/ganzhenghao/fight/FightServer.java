@@ -4,6 +4,7 @@ import com.ganzhenghao.fight.bean.Poker;
 import com.ganzhenghao.fight.bean.PokerNoColor;
 import com.ganzhenghao.fight.thread.FirstConnectThread;
 import com.ganzhenghao.fight.thread.LandlordThread;
+import com.ganzhenghao.fight.utlis.PokerUtils;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class FightServer {
 
-    private static final List<PokerNoColor> POKER = getPokerNoColorList();
+    private static final List<PokerNoColor> POKER = PokerUtils.getPokerNoColorList();
     private static Object[] playerInfo;
     private static List<PokerNoColor> bottom = new ArrayList<>();
     private final static List<String> PLAYERS_ID = new ArrayList<>();
@@ -96,72 +97,7 @@ public class FightServer {
 
     }
 
-    /**
-     * 印刷扑克  TODO 待完善
-     *
-     * @param poker 扑克
-     */
-    private static void printPoker(List<PokerNoColor> poker) {
-        int size = poker.size();
-        System.out.println("————".repeat(size));
-        poker.forEach(e -> {
-            if ("小王".equals(e.getPoint()) || "大王".equals(e.getPoint())) {
-                System.out.print("|" + e);
-            } else {
-                System.out.print("| " + e);
-            }
-        });
-        System.out.println("|");
-        System.out.println("|   ".repeat(size) + "|");
-        System.out.println("|   ".repeat(size) + "|");
-        System.out.println("|   ".repeat(size) + "|");
-        System.out.println("————".repeat(size));
-    }
 
-    /**
-     * 获得扑克列表(带花色)
-     *
-     * @return {@link List<Poker>}
-     */
-    private static List<Poker> getPokerList() {
-        List<String> color = new ArrayList<>(List.of("♠", "♥", "♦", "♣"));
-        List<String> point = new ArrayList<>(List.of("3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"));
-        List<Poker> poker = new ArrayList<>(54);
-        AtomicInteger value = new AtomicInteger(1);
-        point.forEach(p -> {
-            color.forEach(c -> {
-                poker.add(new Poker(c, p, value.intValue()));
-            });
-            value.getAndIncrement();
-        });
-
-        poker.add(new Poker("", "小王", value.intValue()));
-        value.getAndIncrement();
-        poker.add(new Poker("", "大王", value.intValue()));
-        return poker;
-    }
-
-    /**
-     * 获得扑克列表(不带花色)
-     *
-     * @return {@link List<Poker>}
-     */
-    private static List<PokerNoColor> getPokerNoColorList() {
-        List<String> point = new ArrayList<>(List.of("3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"));
-        List<PokerNoColor> poker = new ArrayList<>(54);
-        AtomicInteger value = new AtomicInteger(1);
-        point.forEach(p -> {
-            for (int i = 0; i < 4; i++) {
-                poker.add(new PokerNoColor(p, value.intValue()));
-            }
-            value.getAndIncrement();
-        });
-
-        poker.add(new PokerNoColor("小王", value.intValue()));
-        value.getAndIncrement();
-        poker.add(new PokerNoColor("大王", value.intValue()));
-        return poker;
-    }
 
 
     /**

@@ -40,7 +40,7 @@ public class LandlordThread extends Thread{
                 // 0 -> 是否为地主   1 -> 出牌顺序   3-> 底牌
                 info.add(true);
                 synchronized (lock) {
-                    info.add(sort);
+                    info.add(sort.intValue());
 
                     //添加完成后 唤醒其他等待线程
                     lock.notifyAll();
@@ -61,7 +61,7 @@ public class LandlordThread extends Thread{
 
                 //唤醒后 赋值sort sort ++
                 synchronized (sort) {
-                    info.add(sort);
+                    info.add(sort.intValue());
                     sort.getAndIncrement();
                 }
 

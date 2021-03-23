@@ -57,4 +57,5 @@ public class PokerNoColor implements Comparable<PokerNoColor>, Serializable {
         return this.value - o.getValue();
     }
 
+
 }
