@@ -53,7 +53,7 @@ public class FightClient {
         Map<String, Integer> pointValue = new HashMap<>();
 
 
-        //第三次来连接开始后 根据自己的出牌顺序 开始出牌 直到某一方手牌为0  出牌时需要判断出牌方法
+        //第三次来连接开始后 地主优先出牌  然后发送出牌信息给服务器 其他玩家则只发送信息
         try (Socket socket = new Socket(IP, PORT)) {
 
             OutputStream os = socket.getOutputStream();
@@ -62,20 +62,14 @@ public class FightClient {
                 PokerUtils.printPoker(handCards);
                 System.out.println("您是地主,请先出牌:");
                 String playCards = sc.nextLine();
-                //TODO 解析出牌是否合法 不合法重新输入
-                while (!PokerUtils.checkPlayCards(playCards)) {
+                //解析出牌是否合法 不合法重新输入  返回值 0 -> Rule  1 -> 解析出的出牌列表
+                List<Object> info = PokerUtils.checkPlayCards(playCards);
+                while (info.size() != 2) {
                     System.out.println("出牌不合法,请重新出牌:");
                     playCards = sc.nextLine();
+                    info = PokerUtils.checkPlayCards(playCards);
                 }
-
-                //解析出牌字符串 转换为List<PokerNoColor>
-                List<PokerNoColor> playCardsList = PokerUtils.convertString2List(playCards);
-
                 //解析手牌是否包含所出的牌 如果包含 且符合出票规则 且 大于上家手牌 则出牌
-
-
-
-
             }
 
 

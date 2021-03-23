@@ -1,5 +1,6 @@
 package com.ganzhenghao.fight.bean;
 
+import com.ganzhenghao.fight.NotEqualsException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,5 +58,16 @@ public class PokerNoColor implements Comparable<PokerNoColor>, Serializable {
         return this.value - o.getValue();
     }
 
+    /**
+     * 链式比较两个对象是否相等 相等则返回参数对象
+     * 不相等则抛出异常
+     *
+     * @param pokerNoColor 扑克没有颜色
+     * @return {@link PokerNoColor}
+     */
+    public PokerNoColor chainCompare(PokerNoColor pokerNoColor){
+        if (this.equals(pokerNoColor)){return pokerNoColor;}
+        throw new NotEqualsException("两个对象不相等");
+    }
 
 }
