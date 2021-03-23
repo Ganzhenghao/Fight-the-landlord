@@ -1,5 +1,8 @@
 package com.ganzhenghao.fight.thread;
 
+import com.ganzhenghao.fight.bean.Flag;
+import com.ganzhenghao.fight.bean.PlayCardsInfo;
+import com.ganzhenghao.fight.bean.PlayerInfo;
 import com.ganzhenghao.fight.bean.PokerNoColor;
 import lombok.AllArgsConstructor;
 
@@ -23,6 +26,12 @@ public class LandlordThread extends Thread{
     private final String randomId;
     private final AtomicInteger sort;
     private final Object lock;
+
+    /**
+     * 标志位 判断地主是否出现 出现 true 没有 false
+     */
+    private final Flag flag;
+
     @Override
     public void run() {
 
@@ -33,27 +42,38 @@ public class LandlordThread extends Thread{
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             //第二次连接时 从客户端接受ID 并且比对随机到的Id
-            String id = reader.readLine();
-            ObjectOutputStream oos = new ObjectOutputStream(os);
-            ArrayList<Object> info = new ArrayList<>();
-            if (randomId.equals(id)){
-                // 0 -> 是否为地主   1 -> 出牌顺序   3-> 底牌
-                info.add(true);
-                synchronized (lock) {
-                    info.add(sort.intValue());
+            String line = reader.readLine();
+            PlayerInfo playerInfo = PlayerInfo.parse(line);
 
-                    //添加完成后 唤醒其他等待线程
+            ObjectOutputStream oos = new ObjectOutputStream(os);
+            //ArrayList<Object> info = new ArrayList<>();
+
+            PlayCardsInfo playCardsInfo = new PlayCardsInfo();
+
+            if (randomId.equals(playerInfo.getId())){
+                // 0 -> 是否为地主   1 -> 出牌顺序   3-> 底牌
+                playCardsInfo.setLandlord(true);
+                synchronized (lock) {
+                    //info.add(sort.intValue());
+                    playCardsInfo.setSort(sort.intValue());
+                    //添加完成后 唤醒其他等待线程 修改flag位true
+                    flag.setFlag(true);
                     lock.notifyAll();
+                    System.out.println("地主确认  唤醒 所有其他线程 flag="+flag.isFlag());
                 }
 
             }else{
 
-                info.add(false);
+                //info.add(false);
+                playCardsInfo.setLandlord(false);
 
-                //如果不是地主 线程等待  直到是地主才唤醒
+                //如果不是地主 且地主未出现 线程等待  直到是地主才唤醒
                 synchronized (lock){
                     try {
-                        lock.wait();
+                        if (!flag.isFlag()){
+                            System.out.println("不是地主 , 且地主未出现 线程等待 flag="+flag.isFlag());
+                            lock.wait();
+                        }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -61,16 +81,17 @@ public class LandlordThread extends Thread{
 
                 //唤醒后 赋值sort sort ++
                 synchronized (sort) {
-                    info.add(sort.intValue());
+                    //info.add(sort.intValue());
+                    playCardsInfo.setSort(sort.intValue());
                     sort.getAndIncrement();
                 }
-
             }
-            info.add(bottom);
+            //info.add(bottom);
 
-            oos.writeObject(info);
+            playCardsInfo.setBottomCards(bottom);
+
+            oos.writeObject(playCardsInfo);
             socket.shutdownOutput();
-
 
         } catch (IOException e) {
             e.printStackTrace();

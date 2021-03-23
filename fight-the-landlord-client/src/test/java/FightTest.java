@@ -12,17 +12,17 @@ public class FightTest {
 
     @Test
     public void player1() {
-        FightClient.main(null);
+        FightClient.main(new String[]{"1"});
     }
 
     @Test
     public void player2() {
-        FightClient.main(null);
+        FightClient.main(new String[]{"2"});
     }
 
     @Test
     public void player3() {
-        FightClient.main(null);
+        FightClient.main(new String[]{"3"});
     }
 
 

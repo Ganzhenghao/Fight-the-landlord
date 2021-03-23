@@ -1,5 +1,6 @@
 package com.ganzhenghao.fight.thread;
 
+import com.ganzhenghao.fight.bean.PlayerInfo;
 import lombok.AllArgsConstructor;
 
 import java.io.*;
@@ -19,7 +20,7 @@ public class FirstConnectThread extends Thread {
      * 0 -> id
      * 1-> 手牌
      */
-    private final Object[] playerInfo;
+    private final PlayerInfo playerInfo;
     private final Socket socket;
     private final Object lock;
 

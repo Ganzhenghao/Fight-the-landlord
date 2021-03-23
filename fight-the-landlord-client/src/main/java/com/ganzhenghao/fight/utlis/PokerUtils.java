@@ -1,6 +1,7 @@
 package com.ganzhenghao.fight.utlis;
 
 import com.ganzhenghao.fight.NotEqualsException;
+import com.ganzhenghao.fight.bean.CardsWithRule;
 import com.ganzhenghao.fight.bean.Poker;
 import com.ganzhenghao.fight.bean.PokerNoColor;
 import com.ganzhenghao.fight.enu.Rule;
@@ -47,11 +48,11 @@ public class PokerUtils {
         int size = poker.size();
         System.out.println("————".repeat(size));
         poker.forEach(e -> {
-            if ("S".equals(e.getPoint())) {
+            if ("S".equals(e.getPoint().replace(" ", ""))) {
                 System.out.print("|" + "大王");
-            } else if ("B".equals(e.getPoint())) {
+            } else if ("B".equals(e.getPoint().replace(" ", ""))) {
                 System.out.print("|" + "小王");
-            } else if ("T".equals(e.getPoint())) {
+            } else if ("T".equals(e.getPoint().replace(" ", ""))) {
                 System.out.println("|10");
             } else {
                 System.out.print("| " + e);
@@ -122,17 +123,20 @@ public class PokerUtils {
      * @param playCards 打牌
      * @return {@link List<Object>}
      */
-    public static List<Object> checkPlayCards(String playCards) {
+    public static CardsWithRule checkPlayCards(String playCards) {
 
         List<PokerNoColor> list = convertString2List(playCards);
 
         // 0 -> Rule  1 -> List<PokerNoColor>
-        List<Object> info = new ArrayList<>(2);
+        //List<Object> info = new ArrayList<>(2);
 
+        CardsWithRule cards = new CardsWithRule();
 
         //解析 单张
         if (list.size() == 1) {
-            info.add(Rule.Single);
+            //info.add(Rule.Single);
+
+            cards.setRule(Rule.Single);
         }
 
         //解析对子 王炸
@@ -142,13 +146,13 @@ public class PokerUtils {
             PokerNoColor big = new PokerNoColor("B", POINT_VALUE_MAP.get("B"));
             PokerNoColor small = new PokerNoColor("S", POINT_VALUE_MAP.get("S"));
             if (list.contains(big) && list.contains(small)) {
-                info.add(Rule.KingBomb);
+                cards.setRule(Rule.KingBomb);
             }
 
             //判断是否为对子
 
             if (list.get(0).equals(list.get(1))) {
-                info.add(Rule.Double);
+                cards.setRule(Rule.Double);
             }
         }
 
@@ -160,13 +164,13 @@ public class PokerUtils {
                 list.get(0).chainCompare(list.get(1))
                         .chainCompare(list.get(2))
                         .chainCompare(list.get(3));
-                info.add(Rule.Bomb);
+                cards.setRule(Rule.Bomb);
             } catch (NotEqualsException e) {
                 //三个比较 出异常则表示 不是三带一
                 try {
                     list.get(0).chainCompare(list.get(1))
                             .chainCompare(list.get(2));
-                    info.add(Rule.ThreeBeltOne);
+                    cards.setRule(Rule.ThreeBeltOne);
                 } catch (Exception ignored) { }
             }
         }
@@ -182,7 +186,7 @@ public class PokerUtils {
                 }
             }
             if (flag){
-                info.add(Rule.Straight);
+                cards.setRule(Rule.Straight);
             }
 
             //双数 判断
@@ -196,7 +200,7 @@ public class PokerUtils {
                     }
                 }
                 if (secondFlag){
-                    info.add(Rule.SisterPair);
+                    cards.setRule(Rule.SisterPair);
                 }
             }
         }
@@ -209,12 +213,12 @@ public class PokerUtils {
                 try {
                     list.get(i).chainCompare(list.get(i+1))
                             .chainCompare(list.get(i+2));
-                    info.add(Rule.Plain);
+                    cards.setRule(Rule.Plain);
                 } catch (NotEqualsException ignored) { }
             }
         }
-        info.add(list);
-        return info;
+        cards.setPlayCards(list);
+        return cards;
     }
 
     /**

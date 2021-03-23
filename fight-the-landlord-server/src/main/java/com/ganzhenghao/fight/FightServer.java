@@ -1,6 +1,7 @@
 package com.ganzhenghao.fight;
 
-import com.ganzhenghao.fight.bean.Poker;
+import com.ganzhenghao.fight.bean.Flag;
+import com.ganzhenghao.fight.bean.PlayerInfo;
 import com.ganzhenghao.fight.bean.PokerNoColor;
 import com.ganzhenghao.fight.thread.FirstConnectThread;
 import com.ganzhenghao.fight.thread.LandlordThread;
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FightServer {
 
     private static final List<PokerNoColor> POKER = PokerUtils.getPokerNoColorList();
-    private static Object[] playerInfo;
+    private static final List<PlayerInfo> PLAYER_INFOS = new ArrayList<>();
     private static List<PokerNoColor> bottom = new ArrayList<>();
     private final static List<String> PLAYERS_ID = new ArrayList<>();
 
@@ -44,11 +45,13 @@ public class FightServer {
             int count = 0;
             while (count < 3) {
                 Socket socket = serverSocket.accept();
-                Object[] info = (Object[]) playerInfo[count];
+                //Object[] info = (Object[]) playerInfo[count];
+
+                PlayerInfo playerInfo = PLAYER_INFOS.get(count);
                 String id = UUID.randomUUID().toString().replace("-", "");
                 PLAYERS_ID.add(id);
-                info[0] = id;
-                pool.submit(new FirstConnectThread(info, socket, lock));
+                playerInfo.setId(id);
+                pool.submit(new FirstConnectThread(playerInfo, socket, lock));
                 count++;
             }
 
@@ -84,9 +87,12 @@ public class FightServer {
 
             final AtomicInteger sort = new AtomicInteger(1);
 
-            pool.submit(new LandlordThread(s1,bottom,landlordId,sort,lock));
-            pool.submit(new LandlordThread(s2,bottom,landlordId,sort,lock));
-            pool.submit(new LandlordThread(s3,bottom,landlordId,sort,lock));
+            final Flag flag = new Flag();
+
+            pool.submit(new LandlordThread(s1,bottom,landlordId,sort,lock,flag));
+            pool.submit(new LandlordThread(s2,bottom,landlordId,sort,lock,flag));
+            pool.submit(new LandlordThread(s3,bottom,landlordId,sort,lock,flag));
+
             //进入打牌环节
             
 
@@ -105,9 +111,14 @@ public class FightServer {
      */
     private static void deal() {
 
-        Object[] playerOne = new Object[2];
+/*        Object[] playerOne = new Object[2];
         Object[] playerTwo = new Object[2];
-        Object[] playerThree = new Object[2];
+        Object[] playerThree = new Object[2];*/
+
+        PlayerInfo playerOne = new PlayerInfo();
+        PlayerInfo playerTwo = new PlayerInfo();
+        PlayerInfo playerThree = new PlayerInfo();
+
         bottom.clear();
 
         //洗牌
@@ -124,14 +135,25 @@ public class FightServer {
         Collections.sort(bottom);
 
 
-        playerOne[1] = list1;
+/*        playerOne[1] = list1;
         playerTwo[1] = list2;
-        playerThree[1] = list3;
+        playerThree[1] = list3;*/
 
-        playerInfo = new Object[3];
-        playerInfo[0] = playerOne;
-        playerInfo[1] = playerTwo;
-        playerInfo[2] = playerThree;
+
+        playerOne.setHandCards(list1);
+        playerTwo.setHandCards(list2);
+        playerThree.setHandCards(list3);
+
+
+/*        FightServer.playerInfo = new Object[3];
+        FightServer.playerInfo[0] = playerOne;
+        FightServer.playerInfo[1] = playerTwo;
+        FightServer.playerInfo[2] = playerThree;*/
+
+        PLAYER_INFOS.add(playerOne);
+        PLAYER_INFOS.add(playerTwo);
+        PLAYER_INFOS.add(playerThree);
+
 
     }
 
